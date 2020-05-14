@@ -10,48 +10,43 @@ import java.util.Stack;
 // @lc code=start
 class Solution {
     public String decodeString(String s) {
-        Stack<String> stack = new Stack<>();
-        ArrayList<Integer> list = new ArrayList<>();
-        char[] c = s.toCharArray();
-        StringBuilder temp = new StringBuilder();
-        StringBuilder number = new StringBuilder();
-        for(int i = 0; i < c.length;i++){
-            if(c[i]>='0' && c[i] <= '9'){
-                number.append(String.valueOf(c[i]));
-            }else if (c[i] == '['){
-                list.add(Integer.valueOf(number.toString()));
-                number = new StringBuilder();
-                stack.push(String.valueOf(c[i]));
-            }else if ((c[i] >='a' && c[i] <='z') || (c[i] >= 'A' && c[i]<='Z')){
-                stack.push(String.valueOf(c[i]));
-            }else if(c[i] == ']'){
-                temp = new StringBuilder();
-                ArrayList<String> holder = new ArrayList<>();
-                StringBuilder sb = new StringBuilder();
-                while(!"[".equals(stack.peek())){
-                    holder.add(stack.pop());
+        LinkedList<String> list = new LinkedList<>();
+        StringBuilder sb = new StringBuilder();
+        int number = 0;
+        for(int i = 0; i < s.length(); i++){
+            if(s.charAt(i) >= '0' && s.charAt(i) <= '9'){
+                if(sb.length() != 0){
+                    list.add(sb.toString());
+                    sb = new StringBuilder();
                 }
-                stack.pop();
-                for(int j = holder.size()-1;j>=0;j--){
-                    sb.append(holder.get(j));
+                number = number * 10 + (s.charAt(i)-'0');
+            }
+            if(s.charAt(i) == '['){
+                list.add(String.valueOf(number));
+                number=0;
+                list.add("[");
+            }
+            if((s.charAt(i) >= 'a' && s.charAt(i) <= 'z') || (s.charAt(i) >= 'A' && s.charAt(i) <= 'Z')){
+                sb.append(s.charAt(i));
+            }
+            if(s.charAt(i) == ']'){
+                while(!"[".equals(list.get(list.size()-1))){
+                    sb.insert(0,list.removeLast());
                 }
-                int times = list.remove(list.size()-1);
-                for(int j = 0; j < times; j++){
-                    temp.append(sb);
-                }
-                stack.push(temp.toString());
-                temp = new StringBuilder();
+                list.removeLast();
+                int count = Integer.parseInt(list.removeLast());
+                list.add(String.valueOf(sb).repeat(Math.max(0, count)));
+                sb = new StringBuilder();
             }
         }
-        temp = new StringBuilder();
-        ArrayList<String> holder2 = new ArrayList<>();
-        while(!stack.isEmpty()){
-            holder2.add(stack.pop());
+        if(sb.length()!=0){
+            list.add(sb.toString());
+            sb = new StringBuilder();
         }
-        for(int j = holder2.size()-1;j>=0;j--){
-            temp.append(holder2.get(j));
+        for (String value : list) {
+            sb.append(value);
         }
-        return temp.toString();
+        return sb.toString();
     }
 }
 // @lc code=end
